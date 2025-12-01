@@ -1,0 +1,383 @@
+# ========================================
+# Tickatch - 공통 설정 (Common Configuration)
+# ========================================
+# 모든 마이크로서비스에서 공통으로 사용되는 설정
+# Config Server가 이 파일을 먼저 로드한 후, 서비스별 설정으로 오버라이드
+#
+# 우선순위: 서비스별 설정 > 프로파일별 설정 > 이 공통 설정
+# ========================================
+
+spring:
+  # ========================================
+  # 데이터베이스 설정 (PostgreSQL)
+  # ========================================
+  # 각 서비스별 DB 접속 정보는 서비스별 설정에서 오버라이드
+  datasource:
+    # ----- JDBC URL -----
+    # 환경변수로 오버라이드: DB_HOST, DB_PORT, DB_NAME
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:default_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    # PostgreSQL JDBC 드라이버
+    driver-class-name: org.postgresql.Driver
+
+    # ----- HikariCP 커넥션 풀 설정 -----
+    # 고성능 JDBC 커넥션 풀
+    hikari:
+      # 커넥션 획득 대기 시간 (30초)
+      # 이 시간 내에 커넥션을 얻지 못하면 SQLException 발생
+      connection-timeout: 30000
+
+      # 최대 커넥션 풀 크기
+      # 동시 DB 연결 수 제한 (서버 리소스에 맞게 조정)
+      maximum-pool-size: 10
+
+      # 최소 유휴 커넥션 수
+      # 트래픽 급증 시 커넥션 생성 지연 방지
+      minimum-idle: 5
+
+      # 유휴 커넥션 유지 시간 (10분)
+      # 이 시간 동안 사용되지 않은 커넥션은 풀에서 제거
+      idle-timeout: 600000
+
+      # 커넥션 최대 수명 (30분)
+      # DB 서버의 커넥션 타임아웃보다 짧게 설정
+      max-lifetime: 1800000
+
+      # 커넥션 풀 이름 (로깅, 모니터링용)
+      pool-name: JunBankHikariPool
+
+  # ========================================
+  # JPA / Hibernate 설정
+  # ========================================
+  jpa:
+    # ----- DDL 자동 생성 전략 -----
+    # none: 아무것도 안 함
+    # validate: 엔티티와 테이블 매핑 검증만 (운영 권장)
+    # update: 변경분만 반영 (개발용)
+    # create: 기존 테이블 삭제 후 생성
+    # create-drop: 시작 시 생성, 종료 시 삭제 (테스트용)
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+
+    # ----- Hibernate 속성 -----
+    properties:
+      hibernate:
+        # PostgreSQL 방언 (SQL 생성 시 PostgreSQL 문법 사용)
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+        # SQL 포맷팅 (가독성 향상, 디버깅용)
+        format_sql: true
+
+        # JDBC 배치 처리 크기
+        # INSERT/UPDATE를 모아서 한 번에 실행 (성능 최적화)
+        jdbc:
+          batch_size: 20
+
+        # 배치 처리 최적화
+        # 같은 타입의 SQL을 순서대로 정렬하여 배치 효율 향상
+        order_inserts: true
+        order_updates: true
+
+    # SQL 로그 출력 (개발: true, 운영: false)
+    show-sql: ${JPA_SHOW_SQL:false}
+
+    # 지연 로딩 시 세션 유지 (Open Session In View)
+    # false 권장: 트랜잭션 범위 밖에서 지연 로딩 방지
+    open-in-view: false
+
+  # ========================================
+  # Kafka 메시징 설정
+  # ========================================
+  kafka:
+    # ----- Kafka 브로커 클러스터 주소 -----
+    # 3대의 브로커로 구성된 클러스터
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092,localhost:9093,localhost:9094}
+
+    # ----- Producer (생산자) 설정 -----
+    producer:
+      # 키 직렬화: String → byte[]
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 값 직렬화: Object → JSON → byte[]
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      # ----- 신뢰성 설정 -----
+      # acks: 메시지 전송 확인 레벨
+      # 0: 확인 안 함 (최고 성능, 데이터 유실 가능)
+      # 1: 리더만 확인 (중간)
+      # all/-1: 모든 복제본 확인 (최고 신뢰성)
+      acks: all
+
+      # 전송 실패 시 재시도 횟수
+      retries: 3
+
+      # 추가 속성
+      properties:
+        # 멱등성 보장: 네트워크 오류로 인한 중복 전송 방지
+        enable.idempotence: true
+        # 동시에 전송 가능한 요청 수 (멱등성 사용 시 5 이하)
+        max.in.flight.requests.per.connection: 5
+
+    # ----- Consumer (소비자) 설정 -----
+    consumer:
+      # 컨슈머 그룹 ID (서비스명-group)
+      group-id: ${spring.application.name}-group
+
+      # 키 역직렬화: byte[] → String
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # 값 역직렬화: byte[] → JSON → Object
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+      # ----- 오프셋 리셋 정책 -----
+      # earliest: 처음부터 읽기 (새 컨슈머 그룹일 때)
+      # latest: 최신 메시지부터 읽기
+      auto-offset-reset: earliest
+
+      # ----- 커밋 설정 -----
+      # false: 수동 커밋 (메시지 처리 완료 후 명시적 커밋)
+      # true: 자동 커밋 (주기적으로 자동 커밋, 데이터 유실 가능)
+      enable-auto-commit: false
+
+      # 추가 속성
+      properties:
+        # 역직렬화 시 신뢰할 패키지 (* = 모든 패키지)
+        spring.json.trusted.packages: "*"
+        # 트랜잭션 격리 수준: 커밋된 메시지만 읽기
+        isolation.level: read_committed
+
+    # ----- Listener 설정 -----
+    listener:
+      # 수동 승인 모드: 메시지 처리 완료 후 수동으로 ack
+      # RECORD: 레코드 단위, BATCH: 배치 단위, MANUAL: 수동
+      ack-mode: manual
+      # 동시 처리 컨슈머 스레드 수
+      concurrency: 3
+
+  # ========================================
+  # Spring Cloud 설정
+  # ========================================
+  cloud:
+    # ----- LoadBalancer 설정 -----
+    loadbalancer:
+      ribbon:
+        # Netflix Ribbon 비활성화 (deprecated)
+        # Spring Cloud LoadBalancer 사용
+        enabled: false
+
+# ========================================
+# Actuator 모니터링 설정
+# ========================================
+# 애플리케이션 상태 모니터링 및 관리 엔드포인트
+management:
+  endpoints:
+    web:
+      exposure:
+        # 노출할 엔드포인트 목록
+        # health: 헬스체크
+        # info: 애플리케이션 정보
+        # metrics: 메트릭 조회
+        # prometheus: Prometheus 형식 메트릭
+        # refresh: Config 갱신
+        include: health,info,metrics,prometheus,refresh
+
+  endpoint:
+    # ----- 헬스체크 엔드포인트 -----
+    health:
+      # always: 항상 상세 정보 표시
+      # when-authorized: 인증된 사용자에게만
+      # never: 상세 정보 숨김
+      show-details: always
+
+    # ----- Prometheus 메트릭 -----
+    prometheus:
+      enabled: true
+
+    # ----- 메트릭 엔드포인트 -----
+    metrics:
+      enabled: true
+
+    # ----- Config 갱신 엔드포인트 -----
+    refresh:
+      enabled: true
+
+  # ----- 분산 트레이싱 설정 (Zipkin) -----
+  tracing:
+    sampling:
+      # 트레이싱 샘플링 비율
+      # 1.0: 100% 수집 (개발/테스트)
+      # 0.1: 10% 수집 (운영, 성능 고려)
+      probability: ${TRACING_PROBABILITY:1.0}
+
+  # ----- Zipkin 설정 -----
+  zipkin:
+    tracing:
+      # Zipkin 서버 엔드포인트
+      endpoint: ${ZIPKIN_ENDPOINT:http://localhost:9411/api/v2/spans}
+
+  # ----- 메트릭 설정 -----
+  metrics:
+    export:
+      prometheus:
+        # Prometheus 형식으로 메트릭 내보내기
+        enabled: true
+    tags:
+      # 모든 메트릭에 애플리케이션 이름 태그 추가
+      application: ${spring.application.name}
+
+# ========================================
+# Feign Client 설정
+# ========================================
+# 선언적 REST 클라이언트
+spring:
+  cloud:
+    openfeign:
+      # ----- CircuitBreaker 연동 -----
+      circuitbreaker:
+        # Feign에서 CircuitBreaker 사용
+        enabled: true
+
+feign:
+  client:
+    config:
+      # ----- 기본 설정 (모든 Feign Client 적용) -----
+      default:
+        # 연결 타임아웃 (5초)
+        connectTimeout: 5000
+        # 읽기 타임아웃 (5초)
+        readTimeout: 5000
+        # 로깅 레벨
+        # NONE: 로깅 안 함
+        # BASIC: 요청 메소드, URL, 응답 코드, 실행 시간
+        # HEADERS: BASIC + 요청/응답 헤더
+        # FULL: HEADERS + 요청/응답 바디
+        loggerLevel: basic
+
+# ========================================
+# Resilience4j 설정
+# ========================================
+# 장애 내성 패턴 구현 (Circuit Breaker, Retry, Bulkhead, RateLimiter)
+resilience4j:
+  # ----- Circuit Breaker 설정 -----
+  circuitbreaker:
+    configs:
+      default:
+        # 슬라이딩 윈도우 타입
+        # COUNT_BASED: 호출 횟수 기반
+        # TIME_BASED: 시간 기반
+        slidingWindowType: COUNT_BASED
+
+        # 슬라이딩 윈도우 크기 (최근 N개 호출 기준)
+        slidingWindowSize: 10
+
+        # 회로 차단기 작동을 위한 최소 호출 수
+        minimumNumberOfCalls: 5
+
+        # 반개방 상태에서 허용되는 테스트 호출 수
+        permittedNumberOfCallsInHalfOpenState: 3
+
+        # 실패율 임계값 (%)
+        # 이 비율 초과 시 회로 차단 (OPEN 상태)
+        failureRateThreshold: 50
+
+        # 회로 열림 후 반개방 상태까지 대기 시간
+        waitDurationInOpenState: 10s
+
+        # 실패로 간주할 예외 목록
+        recordExceptions:
+          - java.lang.RuntimeException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+
+  # ----- Retry 설정 -----
+  retry:
+    configs:
+      default:
+        # 최대 재시도 횟수 (원본 포함)
+        maxAttempts: 3
+
+        # 재시도 간 대기 시간
+        waitDuration: 1s
+
+        # 지수 백오프 활성화
+        # 재시도마다 대기 시간 증가: 1s → 2s → 4s
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+
+        # 재시도할 예외 목록
+        retryExceptions:
+          - java.lang.RuntimeException
+          - java.io.IOException
+
+  # ----- Bulkhead 설정 (동시 호출 제한) -----
+  bulkhead:
+    configs:
+      default:
+        # 최대 동시 호출 수
+        maxConcurrentCalls: 25
+
+        # 대기 가능 시간 (이 시간 내 슬롯 확보 못하면 예외)
+        maxWaitDuration: 0ms
+
+  # ----- Rate Limiter 설정 (호출 빈도 제한) -----
+  ratelimiter:
+    configs:
+      default:
+        # 주기당 최대 허용 호출 수
+        limitForPeriod: 100
+
+        # 제한 갱신 주기
+        limitRefreshPeriod: 1s
+
+        # 허가 대기 시간 (0ms: 즉시 거부)
+        timeoutDuration: 0ms
+
+# ========================================
+# SpringDoc OpenAPI 설정
+# ========================================
+# Swagger UI 자동 생성
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    # API 정렬: alpha(알파벳), method(HTTP 메소드)
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+  # 기본 Content-Type
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+# ========================================
+# 로깅 설정
+# ========================================
+logging:
+  level:
+    # 자체 패키지 로그 레벨
+    com.junbank: ${LOG_LEVEL:INFO}
+    # Spring Cloud 로그 레벨
+    org.springframework.cloud: INFO
+    # Kafka 로그 레벨
+    org.springframework.kafka: INFO
+    # Feign 클라이언트 로그 레벨
+    feign: DEBUG
+    # Hibernate SQL 로그 (show-sql 대신 권장)
+    org.hibernate.SQL: ${HIBERNATE_LOG_LEVEL:DEBUG}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${HIBERNATE_LOG_LEVEL:TRACE}
+
+  pattern:
+    # 콘솔 출력 패턴
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-},%X{spanId:-}] %-5level %logger{36} - %msg%n"
+    # 파일 출력 패턴
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-},%X{spanId:-}] %-5level %logger{36} - %msg%n"
+
+  file:
+    # 로그 파일 경로
+    name: logs/${spring.application.name}.log
+    # 로그 파일 최대 크기
+    max-size: 10MB
+    # 로그 파일 보관 일수
+    max-history: 30

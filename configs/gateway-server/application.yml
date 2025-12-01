@@ -1,0 +1,81 @@
+# Gateway Server 설정
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        # Account Service
+        - id: account-service
+          uri: lb://ACCOUNT-SERVICE
+          predicates:
+            - Path=/api/accounts/**
+          filters:
+            - StripPrefix=1
+
+        # Transaction Service
+        - id: transaction-service
+          uri: lb://TRANSACTION-SERVICE
+          predicates:
+            - Path=/api/transactions/**
+          filters:
+            - StripPrefix=1
+
+        # Transfer Service
+        - id: transfer-service
+          uri: lb://TRANSFER-SERVICE
+          predicates:
+            - Path=/api/transfers/**
+          filters:
+            - StripPrefix=1
+
+        # Card Service
+        - id: card-service
+          uri: lb://CARD-SERVICE
+          predicates:
+            - Path=/api/cards/**
+          filters:
+            - StripPrefix=1
+
+        # Ledger Service
+        - id: ledger-service
+          uri: lb://LEDGER-SERVICE
+          predicates:
+            - Path=/api/ledger/**
+          filters:
+            - StripPrefix=1
+
+        # Auth Server
+        - id: auth-server
+          uri: lb://AUTH-SERVER
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
+
+# Gateway Actuator
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus, metrics, gateway
+
+# Logging
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG
