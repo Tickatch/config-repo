@@ -1,6 +1,6 @@
-# Jun Bank Config Repository
+# Tickatch Config Repository
 
-Jun Bank MSA의 **중앙 설정 저장소**입니다.
+Tickatch MSA의 **중앙 설정 저장소**입니다.
 
 ---
 
