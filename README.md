@@ -1,6 +1,6 @@
-# Jun Bank Config Repository
+# Tickatch Config Repository
 
-Jun Bank MSA의 **중앙 설정 저장소**입니다.
+Tickatch MSA의 **중앙 설정 저장소**입니다.
 
 ---
 
@@ -33,24 +33,6 @@ config-repo/
 │   │
 │   ├── account-service/
 │   │   └── application.yml
-│   │
-│   ├── transaction-service/
-│   │   └── application.yml
-│   │
-│   ├── transfer-service/
-│   │   └── application.yml
-│   │
-│   ├── card-service/
-│   │   └── application.yml
-│   │
-│   ├── ledger-service/
-│   │   └── application.yml
-│   │
-│   ├── auth-server/
-│   │   └── application.yml
-│   │
-│   └── user-service/
-│       └── application.yml
 │
 ├── .gitignore
 └── README.md
@@ -80,22 +62,7 @@ Config Server는 다음 순서로 설정을 로드하며, 뒤에 있을수록 �
 - **Kafka**: 메시지 브로커 연결
 - **Logging**: 로그 패턴
 
----
 
-## 서비스별 포트
-
-| 서비스 | 포트 | DB |
-|--------|------|-----|
-| gateway-server | 8080, 8081 | - |
-| account-service | 8081 | PostgreSQL |
-| transaction-service | 8082 | PostgreSQL |
-| transfer-service | 8083 | PostgreSQL |
-| card-service | 8084 | PostgreSQL |
-| ledger-service | 8085 | PostgreSQL |
-| auth-server | 8086 | PostgreSQL |
-| user-service | 8087 | PostgreSQL |
-
----
 
 ## 환경별 프로파일
 

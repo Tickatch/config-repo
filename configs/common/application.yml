@@ -152,6 +152,40 @@ spring:
       ack-mode: manual
       # 동시 처리 컨슈머 스레드 수
       concurrency: 3
+    # ========================================
+    # RabbitMQ 설정
+    # ========================================
+    rabbitmq:
+      host: ${RABBITMQ_HOST:61.254.69.188}
+      port: ${RABBITMQ_PORT:9092}
+      username: ${RABBITMQ_USERNAME:tickatch}
+      password: ${RABBITMQ_PASSWORD:tickatch123}
+      virtual-host: ${RABBITMQ_VHOST:/}
+
+      # 연결 설정
+      connection-timeout: 10000
+
+      # 리스너 설정
+      listener:
+        simple:
+          acknowledge-mode: manual
+          concurrency: 3
+          max-concurrency: 10
+          prefetch: 10
+          retry:
+            enabled: true
+            initial-interval: 1000
+            max-attempts: 3
+            max-interval: 10000
+            multiplier: 2.0
+
+      # 템플릿 설정
+      template:
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+          max-interval: 10000
 
   # ========================================
   # Spring Cloud 설정
