@@ -26,14 +26,14 @@ spring:
           predicates:
             - Path=/api/v1/products/**
           filters:
-            - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products${segment}
+            - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products$\{segment}
 
         - id: product-service-api-docs
           uri: lb://PRODUCT-SERVICE
           predicates:
             - Path=/product-service/v3/api-docs/**
           filters:
-            - RewritePath=/product-service(?<segment>/?.*), ${segment}
+            - RewritePath=/product-service(?<segment>/?.*), $\{segment}
 
         # ========================================
         # Reservation Service
@@ -43,14 +43,14 @@ spring:
           predicates:
             - Path=/api/v1/reservations/**
           filters:
-            - RewritePath=/api/v1/reservations(?<segment>/?.*), /api/v1/reservations${segment}
+            - RewritePath=/api/v1/reservations(?<segment>/?.*), /api/v1/reservations$\{segment}
 
         - id: reservation-service-api-docs
           uri: lb://RESERVATION-SERVICE
           predicates:
             - Path=/reservation-service/v3/api-docs/**
           filters:
-            - RewritePath=/reservation-service(?<segment>/?.*), ${segment}
+            - RewritePath=/reservation-service(?<segment>/?.*), $\{segment}
 
         # ========================================
         # Reservation Seat Service
@@ -60,14 +60,14 @@ spring:
           predicates:
             - Path=/api/v1/reservation-seats/**
           filters:
-            - RewritePath=/api/v1/reservation-seats(?<segment>/?.*), /api/v1/reservation-seats${segment}
+            - RewritePath=/api/v1/reservation-seats(?<segment>/?.*), /api/v1/reservation-seats$\{segment}
 
         - id: reservation-seat-service-api-docs
           uri: lb://RESERVATION-SEAT-SERVICE
           predicates:
-            - Path=/reservation-seat-service/v3/api-docs
+            - Path=/reservation-seat-service/v3/api-docs/**
           filters:
-            - RewritePath=/reservation-seat-service/v3/api-docs, /v3/api-docs
+            - RewritePath=/reservation-seat-service(?<segment>/?.*), $\{segment}
 
         # ========================================
         # Art Hall Service
@@ -77,14 +77,14 @@ spring:
           predicates:
             - Path=/api/v1/arthalls/**
           filters:
-            - RewritePath=/api/v1/arthalls(?<segment>/?.*), /api/v1/arthalls${segment}
+            - RewritePath=/api/v1/arthalls(?<segment>/?.*), /api/v1/arthalls$\{segment}
 
         - id: arthall-service-api-docs
           uri: lb://ARTHALL-SERVICE
           predicates:
             - Path=/arthall-service/v3/api-docs/**
           filters:
-            - RewritePath=/arthall-service(?<segment>/?.*), ${segment}
+            - RewritePath=/arthall-service(?<segment>/?.*), $\{segment}
 
         # ========================================
         # Ticket Service
@@ -94,14 +94,14 @@ spring:
           predicates:
             - Path=/api/v1/tickets/**
           filters:
-            - RewritePath=/api/v1/tickets(?<segment>/?.*), /api/v1/tickets${segment}
+            - RewritePath=/api/v1/tickets(?<segment>/?.*), /api/v1/tickets$\{segment}
 
         - id: ticket-service-api-docs
           uri: lb://TICKET-SERVICE
           predicates:
             - Path=/ticket-service/v3/api-docs/**
           filters:
-            - RewritePath=/ticket-service(?<segment>/?.*), ${segment}
+            - RewritePath=/ticket-service(?<segment>/?.*), $\{segment}
 
 # ========================================
 # SpringDoc OpenAPI / Swagger 통합 설정
