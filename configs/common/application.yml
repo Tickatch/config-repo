@@ -79,7 +79,7 @@ spring:
     connection-timeout: 10000
     listener:
       simple:
-        acknowledge-mode: manual
+        acknowledge-mode: auto
         concurrency: 3
         max-concurrency: 10
         prefetch: 10
