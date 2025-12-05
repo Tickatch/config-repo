@@ -1,4 +1,6 @@
+# ========================================
 # Gateway Server 설정
+# ========================================
 
 spring:
   cloud:
@@ -16,7 +18,9 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
       routes:
+        # ========================================
         # Product Service
+        # ========================================
         - id: product-service
           uri: lb://PRODUCT-SERVICE
           predicates:
@@ -24,7 +28,16 @@ spring:
           filters:
             - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products${segment}
 
+        - id: product-service-api-docs
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/product-service/v3/api-docs
+          filters:
+            - RewritePath=/product-service/v3/api-docs, /v3/api-docs
+
+        # ========================================
         # Reservation Service
+        # ========================================
         - id: reservation-service
           uri: lb://RESERVATION-SERVICE
           predicates:
@@ -32,7 +45,16 @@ spring:
           filters:
             - RewritePath=/api/v1/reservations(?<segment>/?.*), /api/v1/reservations${segment}
 
+        - id: reservation-service-api-docs
+          uri: lb://RESERVATION-SERVICE
+          predicates:
+            - Path=/reservation-service/v3/api-docs
+          filters:
+            - RewritePath=/reservation-service/v3/api-docs, /v3/api-docs
+
+        # ========================================
         # Reservation Seat Service
+        # ========================================
         - id: reservation-seat-service
           uri: lb://RESERVATION-SEAT-SERVICE
           predicates:
@@ -40,7 +62,16 @@ spring:
           filters:
             - RewritePath=/api/v1/reservation-seats(?<segment>/?.*), /api/v1/reservation-seats${segment}
 
+        - id: reservation-seat-service-api-docs
+          uri: lb://RESERVATION-SEAT-SERVICE
+          predicates:
+            - Path=/reservation-seat-service/v3/api-docs
+          filters:
+            - RewritePath=/reservation-seat-service/v3/api-docs, /v3/api-docs
+
+        # ========================================
         # Art Hall Service
+        # ========================================
         - id: arthall-service
           uri: lb://ARTHALL-SERVICE
           predicates:
@@ -48,8 +79,55 @@ spring:
           filters:
             - RewritePath=/api/v1/arthalls(?<segment>/?.*), /api/v1/arthalls${segment}
 
+        - id: arthall-service-api-docs
+          uri: lb://ARTHALL-SERVICE
+          predicates:
+            - Path=/arthall-service/v3/api-docs
+          filters:
+            - RewritePath=/arthall-service/v3/api-docs, /v3/api-docs
 
+        # ========================================
+        # Ticket Service
+        # ========================================
+        - id: ticket-service
+          uri: lb://TICKET-SERVICE
+          predicates:
+            - Path=/api/v1/tickets/**
+          filters:
+            - RewritePath=/api/v1/tickets(?<segment>/?.*), /api/v1/tickets${segment}
+
+        - id: ticket-service-api-docs
+          uri: lb://TICKET-SERVICE
+          predicates:
+            - Path=/ticket-service/v3/api-docs
+          filters:
+            - RewritePath=/ticket-service/v3/api-docs, /v3/api-docs
+
+# ========================================
+# SpringDoc OpenAPI / Swagger 통합 설정
+# ========================================
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: Art Hall Service
+        url: /arthall-service/v3/api-docs
+      - name: Product Service
+        url: /product-service/v3/api-docs
+      - name: Reservation Seat Service
+        url: /reservation-seat-service/v3/api-docs
+      - name: Reservation Service
+        url: /reservation-service/v3/api-docs
+      - name: Ticket Service
+        url: /ticket-service/v3/api-docs
+    urls-primary-name: Product Service
+
+# ========================================
 # Gateway Actuator
+# ========================================
 management:
   endpoint:
     gateway:
@@ -59,7 +137,9 @@ management:
       exposure:
         include: health, info, prometheus, metrics, gateway
 
+# ========================================
 # Logging
+# ========================================
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG

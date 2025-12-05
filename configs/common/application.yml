@@ -204,6 +204,15 @@ springdoc:
   default-produces-media-type: application/json
 
 # ========================================
+# OpenAPI 서비스 설정 (Swagger Try it out 용)
+# ========================================
+openapi:
+  service:
+    url: ${OPENAPI_SERVICE_URL:http://192.168.0.18:8080}
+    title: ${spring.application.name} API
+    description: ${spring.application.name} API Documentation
+
+# ========================================
 # 로깅 설정
 # ========================================
 logging:
