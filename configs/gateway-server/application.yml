@@ -26,14 +26,14 @@ spring:
           predicates:
             - Path=/api/v1/products/**
           filters:
-            - RewritePath=/api/v1/products(?<segment>/?.*), ${segment}
+            - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products${segment}
 
         - id: product-service-api-docs
           uri: lb://PRODUCT-SERVICE
           predicates:
-            - Path=/product-service/v3/api-docs
+            - Path=/product-service/v3/api-docs/**
           filters:
-            - RewritePath=/product-service/v3/api-docs, /v3/api-docs
+            - RewritePath=/product-service(?<segment>/?.*), ${segment}
 
         # ========================================
         # Reservation Service
@@ -48,9 +48,9 @@ spring:
         - id: reservation-service-api-docs
           uri: lb://RESERVATION-SERVICE
           predicates:
-            - Path=/reservation-service/v3/api-docs
+            - Path=/reservation-service/v3/api-docs/**
           filters:
-            - RewritePath=/reservation-service/v3/api-docs, /v3/api-docs
+            - RewritePath=/reservation-service(?<segment>/?.*), ${segment}
 
         # ========================================
         # Reservation Seat Service
@@ -82,9 +82,9 @@ spring:
         - id: arthall-service-api-docs
           uri: lb://ARTHALL-SERVICE
           predicates:
-            - Path=/arthall-service/v3/api-docs
+            - Path=/arthall-service/v3/api-docs/**
           filters:
-            - RewritePath=/arthall-service/v3/api-docs, /v3/api-docs
+            - RewritePath=/arthall-service(?<segment>/?.*), ${segment}
 
         # ========================================
         # Ticket Service
@@ -99,9 +99,9 @@ spring:
         - id: ticket-service-api-docs
           uri: lb://TICKET-SERVICE
           predicates:
-            - Path=/ticket-service/v3/api-docs
+            - Path=/ticket-service/v3/api-docs/**
           filters:
-            - RewritePath=/ticket-service/v3/api-docs, /v3/api-docs
+            - RewritePath=/ticket-service(?<segment>/?.*), ${segment}
 
 # ========================================
 # SpringDoc OpenAPI / Swagger 통합 설정
