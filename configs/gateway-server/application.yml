@@ -5,118 +5,105 @@
 spring:
   cloud:
     gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+          routes:
+            # ========================================
+            # Product Service
+            # ========================================
+            - id: product-service
+              uri: lb://PRODUCT-SERVICE
+              predicates:
+                - Path=/api/v1/products/**
+              filters:
+                - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products$\{segment}
 
-      # =============================
-      # 1. Discovery Locator (Eureka)
-      # =============================
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+            - id: product-service-api-docs
+              uri: lb://PRODUCT-SERVICE
+              predicates:
+                - Path=/product-service/v3/api-docs/**
+              filters:
+                - RewritePath=/product-service(?<segment>/?.*), $\{segment}
 
-      # =============================
-      # 2. 기본 필터 및 CORS
-      # =============================
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+            # ========================================
+            # Reservation Service
+            # ========================================
+            - id: reservation-service
+              uri: lb://RESERVATION-SERVICE
+              predicates:
+                - Path=/api/v1/reservations/**
+              filters:
+                - RewritePath=/api/v1/reservations(?<segment>/?.*), /api/v1/reservations$\{segment}
 
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
+            - id: reservation-service-api-docs
+              uri: lb://RESERVATION-SERVICE
+              predicates:
+                - Path=/reservation-service/v3/api-docs/**
+              filters:
+                - RewritePath=/reservation-service(?<segment>/?.*), $\{segment}
 
-      # =============================
-      # 3. 라우팅 설정
-      # =============================
-      routes:
+            # ========================================
+            # Reservation Seat Service
+            # ========================================
+            - id: reservation-seat-service
+              uri: lb://RESERVATION-SEAT-SERVICE
+              predicates:
+                - Path=/api/v1/reservation-seats/**
+              filters:
+                - RewritePath=/api/v1/reservation-seats(?<segment>/?.*), /api/v1/reservation-seats$\{segment}
 
-        # ========================================
-        # Product Service
-        # ========================================
-        - id: product-service
-          uri: lb://PRODUCT-SERVICE
-          predicates:
-            - Path=/api/v1/products/**
-          filters:
-            - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products${segment}
+            - id: reservation-seat-service-api-docs
+              uri: lb://RESERVATION-SEAT-SERVICE
+              predicates:
+                - Path=/reservation-seat-service/v3/api-docs/**
+              filters:
+                - RewritePath=/reservation-seat-service(?<segment>/?.*), $\{segment}
 
-        - id: product-service-api-docs
-          uri: lb://PRODUCT-SERVICE
-          predicates:
-            - Path=/product-service/v3/api-docs/**
-          filters:
-            - RewritePath=/product-service(?<segment>/?.*), ${segment}
+            # ========================================
+            # Art Hall Service
+            # ========================================
+            - id: arthall-service
+              uri: lb://ARTHALL-SERVICE
+              predicates:
+                - Path=/api/v1/arthalls/**
+              filters:
+                - RewritePath=/api/v1/arthalls(?<segment>/?.*), /api/v1/arthalls$\{segment}
 
-        # ========================================
-        # Reservation Service
-        # ========================================
-        - id: reservation-service
-          uri: lb://RESERVATION-SERVICE
-          predicates:
-            - Path=/api/v1/reservations/**
-          filters:
-            - RewritePath=/api/v1/reservations(?<segment>/?.*), /api/v1/reservations${segment}
+            - id: arthall-service-api-docs
+              uri: lb://ARTHALL-SERVICE
+              predicates:
+                - Path=/arthall-service/v3/api-docs/**
+              filters:
+                - RewritePath=/arthall-service(?<segment>/?.*), $\{segment}
 
-        - id: reservation-service-api-docs
-          uri: lb://RESERVATION-SERVICE
-          predicates:
-            - Path=/reservation-service/v3/api-docs/**
-          filters:
-            - RewritePath=/reservation-service(?<segment>/?.*), ${segment}
+            # ========================================
+            # Ticket Service
+            # ========================================
+            - id: ticket-service
+              uri: lb://TICKET-SERVICE
+              predicates:
+                - Path=/api/v1/tickets/**
+              filters:
+                - RewritePath=/api/v1/tickets(?<segment>/?.*), /api/v1/tickets$\{segment}
 
-        # ========================================
-        # Reservation Seat Service
-        # ========================================
-        - id: reservation-seat-service
-          uri: lb://RESERVATION-SEAT-SERVICE
-          predicates:
-            - Path=/api/v1/reservation-seats/**
-          filters:
-            - RewritePath=/api/v1/reservation-seats(?<segment>/?.*), /api/v1/reservation-seats${segment}
-
-        - id: reservation-seat-service-api-docs
-          uri: lb://RESERVATION-SEAT-SERVICE
-          predicates:
-            - Path=/reservation-seat-service/v3/api-docs/**
-          filters:
-            - RewritePath=/reservation-seat-service(?<segment>/?.*), ${segment}
-
-        # ========================================
-        # Art Hall Service
-        # ========================================
-        - id: arthall-service
-          uri: lb://ARTHALL-SERVICE
-          predicates:
-            - Path=/api/v1/arthalls/**
-          filters:
-            - RewritePath=/api/v1/arthalls(?<segment>/?.*), /api/v1/arthalls${segment}
-
-        - id: arthall-service-api-docs
-          uri: lb://ARTHALL-SERVICE
-          predicates:
-            - Path=/arthall-service/v3/api-docs/**
-          filters:
-            - RewritePath=/arthall-service(?<segment>/?.*), ${segment}
-
-        # ========================================
-        # Ticket Service
-        # ========================================
-        - id: ticket-service
-          uri: lb://TICKET-SERVICE
-          predicates:
-            - Path=/api/v1/tickets/**
-          filters:
-            - RewritePath=/api/v1/tickets(?<segment>/?.*), /api/v1/tickets${segment}
-
-        - id: ticket-service-api-docs
-          uri: lb://TICKET-SERVICE
-          predicates:
-            - Path=/ticket-service/v3/api-docs/**
-          filters:
-            - RewritePath=/ticket-service(?<segment>/?.*), ${segment}
-
+            - id: ticket-service-api-docs
+              uri: lb://TICKET-SERVICE
+              predicates:
+                - Path=/ticket-service/v3/api-docs/**
+              filters:
+                - RewritePath=/ticket-service(?<segment>/?.*), $\{segment}
 
 # ========================================
 # SpringDoc OpenAPI / Swagger 통합 설정
