@@ -1,151 +1,3 @@
-## ========================================
-## Gateway Server 설정
-## ========================================
-#
-#spring:
-#  cloud:
-#    gateway:
-#      discovery:
-#        locator:
-#          enabled: true
-#          lower-case-service-id: true
-#      default-filters:
-#        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-#      globalcors:
-#        cors-configurations:
-#          '[/**]':
-#            allowedOrigins: "*"
-#            allowedMethods: "*"
-#            allowedHeaders: "*"
-#      routes:
-#        # ========================================
-#        # Product Service
-#        # ========================================
-#        - id: product-service
-#          uri: lb://PRODUCT-SERVICE
-#          predicates:
-#            - Path=/api/v1/products/**
-#          filters:
-#            - StripPrefix=0
-#
-#        - id: product-service-api-docs
-#          uri: lb://PRODUCT-SERVICE
-#          predicates:
-#            - Path=/product-service/v3/api-docs/**
-#          filters:
-#            - StripPrefix=1
-#
-#        # ========================================
-#        # Reservation Service
-#        # ========================================
-#        - id: reservation-service
-#          uri: lb://RESERVATION-SERVICE
-#          predicates:
-#            - Path=/api/v1/reservations/**
-#          filters:
-#            - StripPrefix=0
-#
-#        - id: reservation-service-api-docs
-#          uri: lb://RESERVATION-SERVICE
-#          predicates:
-#            - Path=/reservation-service/v3/api-docs/**
-#          filters:
-#            - StripPrefix=1
-#
-#        # ========================================
-#        # Reservation Seat Service
-#        # ========================================
-#        - id: reservation-seat-service
-#          uri: lb://RESERVATION-SEAT-SERVICE
-#          predicates:
-#            - Path=/api/v1/reservation-seats/**
-#          filters:
-#            - StripPrefix=0
-#
-#        - id: reservation-seat-service-api-docs
-#          uri: lb://RESERVATION-SEAT-SERVICE
-#          predicates:
-#            - Path=/reservation-seat-service/v3/api-docs/**
-#          filters:
-#            - StripPrefix=1
-#
-#        # ========================================
-#        # Art Hall Service
-#        # ========================================
-#        - id: arthall-service
-#          uri: lb://ARTHALL-SERVICE
-#          predicates:
-#            - Path=/api/v1/arthalls/**
-#          filters:
-#            - StripPrefix=0
-#
-#        - id: arthall-service-api-docs
-#          uri: lb://ARTHALL-SERVICE
-#          predicates:
-#            - Path=/arthall-service/v3/api-docs/**
-#          filters:
-#            - StripPrefix=1
-#
-#        # ========================================
-#        # Ticket Service
-#        # ========================================
-#        - id: ticket-service
-#          uri: lb://TICKET-SERVICE
-#          predicates:
-#            - Path=/api/v1/tickets/**
-#          filters:
-#            - StripPrefix=0
-#
-#        - id: ticket-service-api-docs
-#          uri: lb://TICKET-SERVICE
-#          predicates:
-#            - Path=/ticket-service/v3/api-docs/**
-#          filters:
-#            - StripPrefix=1
-#
-## ========================================
-## SpringDoc OpenAPI / Swagger 통합 설정
-## ========================================
-#springdoc:
-#  api-docs:
-#    enabled: true
-#  swagger-ui:
-#    enabled: true
-#    path: /swagger-ui.html
-#    urls:
-#      - name: Art Hall Service
-#        url: /arthall-service/v3/api-docs
-#      - name: Product Service
-#        url: /product-service/v3/api-docs
-#      - name: Reservation Seat Service
-#        url: /reservation-seat-service/v3/api-docs
-#      - name: Reservation Service
-#        url: /reservation-service/v3/api-docs
-#      - name: Ticket Service
-#        url: /ticket-service/v3/api-docs
-#    urls-primary-name: Product Service
-#
-## ========================================
-## Gateway Actuator
-## ========================================
-#management:
-#  endpoint:
-#    gateway:
-#      enabled: true
-#  endpoints:
-#    web:
-#      exposure:
-#        include: health, info, prometheus, metrics, gateway
-#
-## ========================================
-## Logging
-## ========================================
-#logging:
-#  level:
-#    org.springframework.cloud.gateway: DEBUG
-#    org.springframework.security: DEBUG
-
-
 # ========================================
 # Gateway Server 설정
 # ========================================
@@ -174,14 +26,14 @@ spring:
           predicates:
             - Path=/api/v1/products/**
           filters:
-            - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products${segment}
+            - StripPrefix=0
 
         - id: product-service-api-docs
           uri: lb://PRODUCT-SERVICE
           predicates:
-            - Path=/product-service/v3/api-docs
+            - Path=/product-service/v3/api-docs/**
           filters:
-            - RewritePath=/product-service/v3/api-docs, /v3/api-docs
+            - StripPrefix=1
 
         # ========================================
         # Reservation Service
@@ -191,14 +43,14 @@ spring:
           predicates:
             - Path=/api/v1/reservations/**
           filters:
-            - RewritePath=/api/v1/reservations(?<segment>/?.*), /api/v1/reservations${segment}
+            - StripPrefix=0
 
         - id: reservation-service-api-docs
           uri: lb://RESERVATION-SERVICE
           predicates:
-            - Path=/reservation-service/v3/api-docs
+            - Path=/reservation-service/v3/api-docs/**
           filters:
-            - RewritePath=/reservation-service/v3/api-docs, /v3/api-docs
+            - StripPrefix=1
 
         # ========================================
         # Reservation Seat Service
@@ -208,14 +60,14 @@ spring:
           predicates:
             - Path=/api/v1/reservation-seats/**
           filters:
-            - RewritePath=/api/v1/reservation-seats(?<segment>/?.*), /api/v1/reservation-seats${segment}
+            - StripPrefix=0
 
         - id: reservation-seat-service-api-docs
           uri: lb://RESERVATION-SEAT-SERVICE
           predicates:
-            - Path=/reservation-seat-service/v3/api-docs
+            - Path=/reservation-seat-service/v3/api-docs/**
           filters:
-            - RewritePath=/reservation-seat-service/v3/api-docs, /v3/api-docs
+            - StripPrefix=1
 
         # ========================================
         # Art Hall Service
@@ -225,14 +77,14 @@ spring:
           predicates:
             - Path=/api/v1/arthalls/**
           filters:
-            - RewritePath=/api/v1/arthalls(?<segment>/?.*), /api/v1/arthalls${segment}
+            - StripPrefix=0
 
         - id: arthall-service-api-docs
           uri: lb://ARTHALL-SERVICE
           predicates:
-            - Path=/arthall-service/v3/api-docs
+            - Path=/arthall-service/v3/api-docs/**
           filters:
-            - RewritePath=/arthall-service/v3/api-docs, /v3/api-docs
+            - StripPrefix=1
 
         # ========================================
         # Ticket Service
@@ -242,14 +94,14 @@ spring:
           predicates:
             - Path=/api/v1/tickets/**
           filters:
-            - RewritePath=/api/v1/tickets(?<segment>/?.*), /api/v1/tickets${segment}
+            - StripPrefix=0
 
         - id: ticket-service-api-docs
           uri: lb://TICKET-SERVICE
           predicates:
-            - Path=/ticket-service/v3/api-docs
+            - Path=/ticket-service/v3/api-docs/**
           filters:
-            - RewritePath=/ticket-service/v3/api-docs, /v3/api-docs
+            - StripPrefix=1
 
 # ========================================
 # SpringDoc OpenAPI / Swagger 통합 설정
@@ -292,3 +144,151 @@ logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.security: DEBUG
+
+
+## ========================================
+## Gateway Server 설정
+## ========================================
+#
+#spring:
+#  cloud:
+#    gateway:
+#      discovery:
+#        locator:
+#          enabled: true
+#          lower-case-service-id: true
+#      default-filters:
+#        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+#      globalcors:
+#        cors-configurations:
+#          '[/**]':
+#            allowedOrigins: "*"
+#            allowedMethods: "*"
+#            allowedHeaders: "*"
+#      routes:
+#        # ========================================
+#        # Product Service
+#        # ========================================
+#        - id: product-service
+#          uri: lb://PRODUCT-SERVICE
+#          predicates:
+#            - Path=/api/v1/products/**
+#          filters:
+#            - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products${segment}
+#
+#        - id: product-service-api-docs
+#          uri: lb://PRODUCT-SERVICE
+#          predicates:
+#            - Path=/product-service/v3/api-docs
+#          filters:
+#            - RewritePath=/product-service/v3/api-docs, /v3/api-docs
+#
+#        # ========================================
+#        # Reservation Service
+#        # ========================================
+#        - id: reservation-service
+#          uri: lb://RESERVATION-SERVICE
+#          predicates:
+#            - Path=/api/v1/reservations/**
+#          filters:
+#            - RewritePath=/api/v1/reservations(?<segment>/?.*), /api/v1/reservations${segment}
+#
+#        - id: reservation-service-api-docs
+#          uri: lb://RESERVATION-SERVICE
+#          predicates:
+#            - Path=/reservation-service/v3/api-docs
+#          filters:
+#            - RewritePath=/reservation-service/v3/api-docs, /v3/api-docs
+#
+#        # ========================================
+#        # Reservation Seat Service
+#        # ========================================
+#        - id: reservation-seat-service
+#          uri: lb://RESERVATION-SEAT-SERVICE
+#          predicates:
+#            - Path=/api/v1/reservation-seats/**
+#          filters:
+#            - RewritePath=/api/v1/reservation-seats(?<segment>/?.*), /api/v1/reservation-seats${segment}
+#
+#        - id: reservation-seat-service-api-docs
+#          uri: lb://RESERVATION-SEAT-SERVICE
+#          predicates:
+#            - Path=/reservation-seat-service/v3/api-docs
+#          filters:
+#            - RewritePath=/reservation-seat-service/v3/api-docs, /v3/api-docs
+#
+#        # ========================================
+#        # Art Hall Service
+#        # ========================================
+#        - id: arthall-service
+#          uri: lb://ARTHALL-SERVICE
+#          predicates:
+#            - Path=/api/v1/arthalls/**
+#          filters:
+#            - RewritePath=/api/v1/arthalls(?<segment>/?.*), /api/v1/arthalls${segment}
+#
+#        - id: arthall-service-api-docs
+#          uri: lb://ARTHALL-SERVICE
+#          predicates:
+#            - Path=/arthall-service/v3/api-docs
+#          filters:
+#            - RewritePath=/arthall-service/v3/api-docs, /v3/api-docs
+#
+#        # ========================================
+#        # Ticket Service
+#        # ========================================
+#        - id: ticket-service
+#          uri: lb://TICKET-SERVICE
+#          predicates:
+#            - Path=/api/v1/tickets/**
+#          filters:
+#            - RewritePath=/api/v1/tickets(?<segment>/?.*), /api/v1/tickets${segment}
+#
+#        - id: ticket-service-api-docs
+#          uri: lb://TICKET-SERVICE
+#          predicates:
+#            - Path=/ticket-service/v3/api-docs
+#          filters:
+#            - RewritePath=/ticket-service/v3/api-docs, /v3/api-docs
+#
+## ========================================
+## SpringDoc OpenAPI / Swagger 통합 설정
+## ========================================
+#springdoc:
+#  api-docs:
+#    enabled: true
+#  swagger-ui:
+#    enabled: true
+#    path: /swagger-ui.html
+#    urls:
+#      - name: Art Hall Service
+#        url: /arthall-service/v3/api-docs
+#      - name: Product Service
+#        url: /product-service/v3/api-docs
+#      - name: Reservation Seat Service
+#        url: /reservation-seat-service/v3/api-docs
+#      - name: Reservation Service
+#        url: /reservation-service/v3/api-docs
+#      - name: Ticket Service
+#        url: /ticket-service/v3/api-docs
+#    urls-primary-name: Product Service
+#
+## ========================================
+## Gateway Actuator
+## ========================================
+#management:
+#  endpoint:
+#    gateway:
+#      enabled: true
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health, info, prometheus, metrics, gateway
+#
+## ========================================
+## Logging
+## ========================================
+#logging:
+#  level:
+#    org.springframework.cloud.gateway: DEBUG
+#    org.springframework.security: DEBUG
