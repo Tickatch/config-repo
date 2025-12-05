@@ -16,13 +16,38 @@ spring:
             allowedMethods: "*"
             allowedHeaders: "*"
       routes:
-        # Account Service
+        # Product Service
         - id: product-service
           uri: lb://PRODUCT-SERVICE
           predicates:
-            - Path=/api/product/**
+            - Path=/api/v1/products/**
           filters:
-            - RewritePath=/v1/product(?<segment>/?.*), $\{segment}
+            - RewritePath=/api/v1/products(?<segment>/?.*), /api/v1/products${segment}
+
+        # Reservation Service
+        - id: reservation-service
+          uri: lb://RESERVATION-SERVICE
+          predicates:
+            - Path=/api/v1/reservations/**
+          filters:
+            - RewritePath=/api/v1/reservations(?<segment>/?.*), /api/v1/reservations${segment}
+
+        # Reservation Seat Service
+        - id: reservation-seat-service
+          uri: lb://RESERVATION-SEAT-SERVICE
+          predicates:
+            - Path=/api/v1/reservation-seats/**
+          filters:
+            - RewritePath=/api/v1/reservation-seats(?<segment>/?.*), /api/v1/reservation-seats${segment}
+
+        # Art Hall Service
+        - id: arthall-service
+          uri: lb://ARTHALL-SERVICE
+          predicates:
+            - Path=/api/v1/arthalls/**
+          filters:
+            - RewritePath=/api/v1/arthalls(?<segment>/?.*), /api/v1/arthalls${segment}
+
 
 # Gateway Actuator
 management:
