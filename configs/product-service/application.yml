@@ -8,3 +8,5 @@
 messaging:
   exchange:
     product: tickatch.product
+    arthall: tickatch.arthall
+    reservation-seat: tickatch.reservation-seat
