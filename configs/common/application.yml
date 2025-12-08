@@ -147,7 +147,7 @@ management:
           job: ${spring.application.name}
           grouping-key:
             instance: ${spring.application.name}:${server.port:8080}
-          shutdown-operation: push
+          shutdown-operation: POST
 
 # ========================================
 # Feign Client 설정
