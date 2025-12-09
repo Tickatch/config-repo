@@ -6,11 +6,18 @@
 # ========================================
 
 # ========================================
-# JWT 설정
+# JWT 설정 (RS256 - 비대칭키)
 # ========================================
 jwt:
-  secret: ${JWT_SECRET}
   issuer: ${JWT_ISSUER:tickatch}
+  key-id: ${JWT_KEY_ID:tickatch-auth-key-1}
+  key-directory: ${JWT_KEY_DIRECTORY:data/keys}
+  # 프로덕션에서는 환경변수로 키 값을 주입 (Base64 인코딩)
+  private-key: ${JWT_PRIVATE_KEY:}
+  public-key: ${JWT_PUBLIC_KEY:}
+  # 또는 파일 경로로 지정
+  private-key-path: ${JWT_PRIVATE_KEY_PATH:}
+  public-key-path: ${JWT_PUBLIC_KEY_PATH:}
   access-token:
     expiration: ${JWT_ACCESS_EXPIRATION:300}  # 5분 (초 단위)
 
