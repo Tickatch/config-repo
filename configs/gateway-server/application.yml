@@ -3,6 +3,16 @@
 # ========================================
 
 spring:
+  # ========================================
+  # Security - JWT 검증 (OAuth2 Resource Server)
+  # ========================================
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Auth Service의 JWKS 엔드포인트 (Eureka 서비스명 사용)
+          jwk-set-uri: ${JWT_JWKS_URI:http://localhost:8090/.well-known/jwks.json}
+          issuer-uri: ${JWT_ISSUER:tickatch}
   cloud:
     gateway:
       server:
@@ -20,6 +30,30 @@ spring:
                 allowedMethods: "*"
                 allowedHeaders: "*"
           routes:
+            # ========================================
+            # Auth Service
+            # ========================================
+            - id: auth-service
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/api/v1/auth/**
+              filters:
+                - RewritePath=/api/v1/auth(?<segment>/?.*), /api/v1/auth$\{segment}
+
+            - id: auth-service-jwks
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/.well-known/**
+              filters:
+                - RewritePath=/.well-known(?<segment>/?.*), /.well-known$\{segment}
+
+            - id: auth-service-api-docs
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/auth-service/v3/api-docs/**
+              filters:
+                - RewritePath=/auth-service(?<segment>/?.*), $\{segment}
+
             # ========================================
             # Product Service
             # ========================================
@@ -115,6 +149,8 @@ springdoc:
     enabled: true
     path: /swagger-ui.html
     urls:
+      - name: Auth Service
+      - url: /auth-service/v3/api-docs
       - name: Art Hall Service
         url: /arthall-service/v3/api-docs
       - name: Product Service
@@ -146,3 +182,4 @@ logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
