@@ -142,12 +142,12 @@ management:
       export:
         pushgateway:
           enabled: true
-          base-url: ${PUSHGATEWAY_URL:https://www.pinjun.xyz/pushgateway}
-          push-rate: 30s
+          # base-url → address로 변경, scheme 별도 지정
+          address: www.pinjun.xyz:9091
+          scheme: http
           job: ${spring.application.name}
-          grouping-key:
-            instance: ${spring.application.name}:${server.port:8080}
-          shutdown-operation: POST
+          # push-rate → push-interval (Duration 형식)
+          push-interval: 30s
 
 # ========================================
 # Feign Client 설정
