@@ -55,6 +55,23 @@ spring:
                 - RewritePath=/auth-service(?<segment>/?.*), $\{segment}
 
             # ========================================
+            # User Service
+            # ========================================
+            - id: user-service
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/api/v1/user/**
+              filters:
+                - RewritePath=/api/v1/user(?<segment>/?.*), /api/v1/user$\{segment}
+
+            - id: user-service-api-docs
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/user-service/v3/api-docs/**
+              filters:
+                - RewritePath=/user-service(?<segment>/?.*), $\{segment}
+
+            # ========================================
             # Product Service
             # ========================================
             - id: product-service
