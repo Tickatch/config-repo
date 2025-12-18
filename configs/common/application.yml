@@ -143,7 +143,7 @@ management:
         pushgateway:
           enabled: true
           # base-url → address로 변경, scheme 별도 지정
-          address: www.pinjun.xyz:9091
+          address: ${pushgateway_ENDPOINT:www.pinjun.xyz}:9091
           scheme: http
           job: ${spring.application.name}
           # push-rate → push-interval (Duration 형식)
