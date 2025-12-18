@@ -88,6 +88,20 @@ spring:
               filters:
                 - RewritePath=/product-service(?<segment>/?.*), $\{segment}
 
+            #
+            - id: payment-service
+              uri: lb://PAYMENT-SERVICE
+              predicates:
+                - Path=/api/v1/payments/**
+              filters:
+                - RewritePath=/api/v1/payments(?<segment>/?.*), /api/v1/payments$\{segment}
+
+            - id: payment-service-api-docs
+              uri: lb://PAYMENT-SERVICE
+              predicates:
+                - Path=/payment-service/v3/api-docs/**
+              filters:
+                - RewritePath=/payment-service(?<segment>/?.*), $\{segment}
             # ========================================
             # Reservation Service
             # ========================================
