@@ -1,0 +1,18 @@
+# ========================================
+# Notification Sender Service 설정
+# ========================================
+
+# ========================================
+# 메시징 설정 (RabbitMQ Exchange)
+# ========================================
+messaging:
+  exchange:
+    notification-sender: tickatch.notification-sender
+  email:
+    exchange: tickatch.email
+  sms:
+    exchange: tickatch.sms
+  mms:
+    exchange: tickatch.mms
+  slack:
+    exchange: tickatch.slack
