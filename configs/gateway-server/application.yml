@@ -180,7 +180,7 @@ springdoc:
     enabled: true
     path: /swagger-ui.html
     urls:
-      - name: Gateway Server / Queue API
+      - name: Gateway Server (Queue API)
         url: /v3/api-docs
       - name: Auth Service
         url: /auth-service/v3/api-docs
