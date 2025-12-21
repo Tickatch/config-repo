@@ -181,7 +181,7 @@ springdoc:
     path: /swagger-ui.html
     urls:
       - name: Auth Service
-      - url: /auth-service/v3/api-docs
+        url: /auth-service/v3/api-docs
       - name: Art Hall Service
         url: /arthall-service/v3/api-docs
       - name: Product Service
