@@ -31,6 +31,15 @@ spring:
                 allowedHeaders: "*"
           routes:
             # ========================================
+            # Test Service
+            # ========================================
+            - id: test-service
+              uri: lb://TEST-SERVICE
+              predicates:
+                - Path=/api/v1/test/**
+              filters:
+                - RewritePath=/api/v1/test(?<segment>/?.*), /api/v1/test$\{segment}
+            # ========================================
             # Auth Service
             # ========================================
             - id: auth-service
